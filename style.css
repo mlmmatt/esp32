@@ -12,8 +12,16 @@
   --diagram-accent: #22c55e;
   --diagram-muted: #6b7280;
   --diagram-bus: #38bdf8;
+  --diagram-pulse: #f59e0b;
+  --diagram-power: #f87171;
+  --diagram-ground: #94a3b8;
   --diagram-text: #e5e7eb;
   --diagram-board: #111827;
+  --diagram-board-deep: #09111e;
+  --diagram-card: #101827;
+  --diagram-card-alt: #162033;
+  --diagram-copper: #f4b860;
+  --diagram-silver: #cbd5e1;
 }
 
 * { box-sizing: border-box; }
@@ -123,8 +131,15 @@ header .tag {
 .module-item .notes { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
 .center-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.diagram-wrap { flex: 1; min-height: 260px; overflow: auto; }
-.diagram-wrap svg { width: 100%; height: auto; }
+.diagram-wrap {
+  flex: 1;
+  min-height: 420px;
+  overflow: auto;
+  background:
+    radial-gradient(circle at top, rgba(56,189,248,0.08), transparent 28%),
+    linear-gradient(180deg, rgba(10,18,31,0.95), rgba(9,14,24,0.95));
+}
+.diagram-wrap svg { width: 100%; min-width: 1040px; height: auto; display: block; }
 
 .messages { list-style: none; margin: 8px 0; padding: 0; font-size: 12px; }
 .messages li { padding: 4px 0; }
