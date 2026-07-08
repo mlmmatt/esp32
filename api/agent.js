@@ -96,8 +96,7 @@ async function callOpenRouter(payload) {
       messages: [
         { role: "system", content: prompt.system },
         { role: "user", content: prompt.user },
-      ],
-      response_format: { type: "json_object" },
+      ]
     }),
   });
 
