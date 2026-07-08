@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ESP32 Circuit Playground -- built with Hy3</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+  <h1>ESP32 Circuit Playground</h1>
+  <span class="tag">module picker + AI wiring &amp; code, powered by Hy3 (tencent/hy3:free)</span>
+  <span class="status-pill" id="status-pill" style="margin-left:auto;">Hy3: idle</span>
+</header>
+
+<div class="layout">
+  <div class="panel" id="left-panel">
+    <h2>Quick start</h2>
+    <div class="presets" id="presets"></div>
+
+    <h2>Board</h2>
+    <div class="board-select" id="board-select"></div>
+
+    <h2>Modules</h2>
+    <div class="module-list" id="module-list"></div>
+  </div>
+
+  <div class="center-col">
+    <div class="panel diagram-wrap" id="diagram-wrap"></div>
+    <ul class="messages" id="messages"></ul>
+    <div class="panel" style="flex:1; display:flex; flex-direction:column;">
+      <h2>Generated sketch</h2>
+      <div class="code-wrap" style="flex:1;"><pre id="code-output">// Select modules or a preset to generate code.</pre></div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="panel" style="flex:1; display:flex; flex-direction:column;">
+      <h2>Chat with the agent</h2>
+      <div class="chat-log" id="chat-log"></div>
+      <div class="chat-input">
+        <input id="chat-input" type="text" placeholder='e.g. "add a buzzer alarm above 70% humidity"' />
+        <button id="chat-send">Send</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Simulated serial monitor</h2>
+      <div class="serial-monitor" id="serial-monitor"></div>
+    </div>
+  </div>
+</div>
+
+<script src="modules.js"></script>
+<script src="pinmap.js"></script>
+<script src="diagram.js"></script>
+<script src="fallback.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

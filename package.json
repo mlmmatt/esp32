@@ -1,0 +1,13 @@
+{
+  "name": "esp32-playground",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ESP32 Circuit Playground - preset-first deterministic wiring + Hy3 tutoring",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "echo 'Static site: no build step required'",
+    "vercel-build": "echo 'Static site: no build step required'"
+  }
+}
