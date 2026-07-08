@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180">
+  <defs>
+    <linearGradient id="pcb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b256d"/>
+      <stop offset="100%" stop-color="#3a1441"/>
+    </linearGradient>
+  </defs>
+  <rect x="36" y="18" width="128" height="120" rx="12" fill="url(#pcb)" stroke="#8b5cf6" stroke-width="4"/>
+  <rect x="68" y="46" width="64" height="44" rx="8" fill="#151320" stroke="#b794f4" stroke-width="3"/>
+  <circle cx="48" cy="30" r="6" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="152" cy="30" r="6" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+  <g fill="#d6dde5" stroke="#8c99a6" stroke-width="2">
+    <rect x="50" y="138" width="8" height="24" rx="2"/>
+    <rect x="70" y="138" width="8" height="24" rx="2"/>
+    <rect x="90" y="138" width="8" height="24" rx="2"/>
+    <rect x="110" y="138" width="8" height="24" rx="2"/>
+    <rect x="130" y="138" width="8" height="24" rx="2"/>
+  </g>
+  <text x="100" y="114" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="16" fill="#e9d5ff">BMP280</text>
+  <text x="100" y="174" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#dbeafe">I²C breakout</text>
+</svg>

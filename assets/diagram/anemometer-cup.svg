@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220">
+  <line x1="120" y1="92" x2="120" y2="176" stroke="#9ca3af" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="120" cy="92" r="10" fill="#cbd5e1" stroke="#64748b" stroke-width="4"/>
+  <line x1="120" y1="92" x2="176" y2="62" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/>
+  <line x1="120" y1="92" x2="68" y2="56" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/>
+  <line x1="120" y1="92" x2="118" y2="28" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/>
+  <path d="M176 62 C190 48 208 50 214 66 C206 78 188 80 176 62 Z" fill="#475569" stroke="#cbd5e1" stroke-width="3"/>
+  <path d="M68 56 C54 42 34 44 26 60 C34 72 54 74 68 56 Z" fill="#475569" stroke="#cbd5e1" stroke-width="3"/>
+  <path d="M118 28 C110 10 92 4 78 14 C80 30 94 40 118 28 Z" fill="#475569" stroke="#cbd5e1" stroke-width="3"/>
+  <rect x="106" y="176" width="28" height="20" rx="6" fill="#334155" stroke="#94a3b8" stroke-width="3"/>
+  <path d="M160 138 C176 126 196 126 212 138" fill="none" stroke="#7dd3fc" stroke-width="5" opacity="0.75" stroke-linecap="round"/>
+  <path d="M152 160 C170 148 194 148 218 162" fill="none" stroke="#7dd3fc" stroke-width="4" opacity="0.45" stroke-linecap="round"/>
+  <text x="120" y="214" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#dbeafe">Cup anemometer</text>
+</svg>

@@ -65,13 +65,13 @@ const PIN_LAYOUTS = {
 };
 
 const ROW_H = 32;
-const TOP_MARGIN = 86;
-const BOARD_X = 390;
-const BOARD_W = 264;
-const CARD_W = 220;
-const CARD_H = 82;
-const CARD_GAP = 10;
-const SVG_W = 1180;
+const TOP_MARGIN = 98;
+const BOARD_X = 442;
+const BOARD_W = 284;
+const CARD_W = 256;
+const CARD_H = 96;
+const CARD_GAP = 16;
+const SVG_W = 1368;
 const COLORS = {
   used: "var(--diagram-accent, #22c55e)",
   unused: "var(--diagram-muted, #5b6473)",
@@ -86,6 +86,20 @@ const COLORS = {
   cardAlt: "var(--diagram-card-alt, #162033)",
   copper: "var(--diagram-copper, #f4b860)",
   silver: "var(--diagram-silver, #cbd5e1)",
+};
+
+const DIAGRAM_ASSETS = {
+  boards: {
+    devkit: "/assets/diagram/esp32-devkit-v1.svg",
+  },
+  modules: {
+    dht22: "/assets/diagram/dht22.svg",
+    bmp280: "/assets/diagram/bmp280-breakout.svg",
+    oled_ssd1306: "/assets/diagram/ssd1306-oled-096.svg",
+    buzzer: "/assets/diagram/piezo-buzzer.svg",
+    rain_gauge: "/assets/diagram/rain-gauge.svg",
+    anemometer: "/assets/diagram/anemometer-cup.svg",
+  },
 };
 
 function esc(s) {
@@ -122,7 +136,19 @@ function moduleDetailText(mod) {
   return mod.tutorSummary || mod.notes || "Deterministic module assignment";
 }
 
-function renderModuleIcon(icon, x, y, accent) {
+function moduleAssetPath(mod) {
+  return mod?.id ? DIAGRAM_ASSETS.modules[mod.id] || null : null;
+}
+
+function boardAssetPath(boardId) {
+  return DIAGRAM_ASSETS.boards[boardId] || null;
+}
+
+function renderModuleIcon(icon, x, y, accent, mod) {
+  const assetPath = moduleAssetPath(mod);
+  if (assetPath) {
+    return `<image href="${assetPath}" x="${x + 2}" y="${y + 2}" width="74" height="58" preserveAspectRatio="xMidYMid meet"/>`;
+  }
   if (icon === "rain") {
     return [
       `<rect x="${x + 8}" y="${y + 22}" width="26" height="18" rx="4" fill="#18314d" stroke="${accent}" stroke-width="1.5"/>`,
@@ -226,10 +252,14 @@ function renderBoardArt(parts, boardTop, boardBottom, boardLabel, rows, boardId)
   </defs>`);
 
   parts.push(`<rect x="${BOARD_X}" y="${boardTop}" width="${BOARD_W}" height="${boardH}" rx="18" fill="url(#boardShell)" stroke="#334155" stroke-width="1.6" filter="url(#shadow)"/>`);
-  parts.push(`<rect x="${BOARD_X + 80}" y="${boardTop + 14}" width="${BOARD_W - 160}" height="26" rx="8" fill="#0b1220" stroke="#3b4b63" stroke-width="1"/>`);
+  const boardAsset = boardAssetPath(boardId);
+  if (boardAsset) {
+    parts.push(`<image href="${boardAsset}" x="${BOARD_X + 18}" y="${boardTop + 6}" width="${BOARD_W - 36}" height="${boardH - 12}" preserveAspectRatio="xMidYMid meet"/>`);
+  }
+  parts.push(`<rect x="${BOARD_X + 80}" y="${boardTop + 14}" width="${BOARD_W - 160}" height="26" rx="8" fill="#0b1220" stroke="#3b4b63" stroke-width="1" opacity="0.82"/>`);
   parts.push(`<text x="${centerX}" y="${boardTop + 31}" text-anchor="middle" font-size="11" font-weight="600" letter-spacing="1.3" fill="#cbd5e1">${esc(boardLabel)}</text>`);
 
-  if (boardId === "devkit") {
+  if (boardId === "devkit" && !boardAsset) {
     parts.push(`<rect x="${centerX - 42}" y="${boardTop - 16}" width="84" height="28" rx="8" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.2"/>`);
     parts.push(`<rect x="${centerX - 18}" y="${boardTop - 8}" width="36" height="10" rx="3" fill="#64748b"/>`);
     parts.push(`<rect x="${BOARD_X + 76}" y="${boardTop + 58}" width="${BOARD_W - 152}" height="70" rx="8" fill="#101b2d" stroke="#314156" stroke-width="1.2"/>`);
@@ -238,7 +268,7 @@ function renderBoardArt(parts, boardTop, boardBottom, boardLabel, rows, boardId)
     parts.push(`<rect x="${BOARD_X + 36}" y="${boardTop + 56}" width="24" height="30" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1"/>`);
     parts.push(`<circle cx="${BOARD_X + 48}" cy="${boardTop + 71}" r="6" fill="#475569"/>`);
     parts.push(`<text x="${BOARD_X + 48}" y="${boardTop + 75}" text-anchor="middle" font-size="8" fill="#cbd5e1">EN</text>`);
-  } else {
+  } else if (boardId !== "devkit") {
     parts.push(`<rect x="${BOARD_X + 56}" y="${boardTop + 54}" width="${BOARD_W - 112}" height="94" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1.2"/>`);
     parts.push(`<rect x="${BOARD_X + 94}" y="${boardTop + 66}" width="${BOARD_W - 188}" height="50" rx="5" fill="#111827" stroke="#475569" stroke-width="1"/>`);
     parts.push(`<circle cx="${centerX}" cy="${boardTop + 134}" r="28" fill="#0b1220" stroke="#475569" stroke-width="1.1"/>`);
@@ -265,8 +295,6 @@ function renderDiagramSVG(boardId, catalog, assignResult) {
   const rows = Math.max(layout.left.length, layout.right.length);
   const boardTop = TOP_MARGIN - 18;
   const boardBottom = TOP_MARGIN + rows * ROW_H + 14;
-  const legendY = boardBottom + 116;
-  const height = legendY + 58;
 
   const gpioMeta = {};
   layout.left.forEach((pin, i) => {
@@ -313,14 +341,25 @@ function renderDiagramSVG(boardId, catalog, assignResult) {
     });
   }
 
-  const leftCards = layoutCards(moduleCards.filter((m) => m.side === "left"), boardTop + 28, boardBottom - 28);
-  const rightCards = layoutCards(moduleCards.filter((m) => m.side === "right"), boardTop + 28, boardBottom - 28);
+  const leftCards = layoutCards(moduleCards.filter((m) => m.side === "left"), boardTop + 24, boardBottom - 24);
+  const rightCards = layoutCards(moduleCards.filter((m) => m.side === "right"), boardTop + 24, boardBottom - 24);
+
+  const hasI2C = i2cModules.length > 0;
+  const busY = hasI2C ? boardBottom + 40 : null;
+  const i2cRowGap = 32;
+  const i2cBoxW = 438;
+  const i2cBoxH = hasI2C ? 56 + i2cModules.length * i2cRowGap : 0;
+  const i2cBoxX = BOARD_X + BOARD_W / 2 - i2cBoxW / 2;
+  const i2cBoxY = hasI2C ? busY + 20 : null;
+  const i2cBoxBottom = hasI2C ? i2cBoxY + i2cBoxH : boardBottom;
+  const legendY = (hasI2C ? i2cBoxBottom : boardBottom) + 40;
+  const height = legendY + 58;
 
   const parts = [];
   parts.push(`<svg viewBox="0 0 ${SVG_W} ${height}" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">`);
   parts.push(`<rect x="0" y="0" width="${SVG_W}" height="${height}" fill="none"/>`);
   parts.push(`<text x="${SVG_W / 2}" y="34" text-anchor="middle" font-size="21" font-weight="700" fill="${COLORS.text}">${esc(layout.boardLabel)}</text>`);
-  parts.push(`<text x="${SVG_W / 2}" y="56" text-anchor="middle" font-size="12" fill="#94a3b8">Deterministic wiring plan — board pins and module cards stay grounded to the real allocation.</text>`);
+  parts.push(`<text x="${SVG_W / 2}" y="60" text-anchor="middle" font-size="12" fill="#a7b7ca">Deterministic wiring plan — board pins and module cards stay grounded to the real allocation.</text>`);
 
   renderBoardArt(parts, boardTop, boardBottom, layout.boardLabel, rows, boardId);
 
@@ -345,27 +384,27 @@ function renderDiagramSVG(boardId, catalog, assignResult) {
   function drawModuleCards(items, side) {
     const isLeft = side === "left";
     items.forEach((item) => {
-      const cardX = isLeft ? 72 : SVG_W - 72 - CARD_W;
+      const cardX = isLeft ? 76 : SVG_W - 76 - CARD_W;
       const cardY = item.cardY;
       const cardCenterY = cardY + CARD_H / 2;
       const pinX = isLeft ? BOARD_X - 32 : BOARD_X + BOARD_W + 32;
       const cardJoinX = isLeft ? cardX + CARD_W : cardX;
-      const midX = isLeft ? cardJoinX + 32 : cardJoinX - 32;
+      const midX = isLeft ? cardJoinX + 42 : cardJoinX - 42;
       const connectorX = isLeft ? cardX + CARD_W - 12 : cardX + 12;
-      const pinBadgeX = isLeft ? cardX + CARD_W - 76 : cardX + 18;
+      const pinBadgeX = isLeft ? cardX + CARD_W - 78 : cardX + 20;
       const stroke = item.theme.stroke;
       const accent = item.theme.accent;
 
-      parts.push(`<path d="M ${pinX} ${item.anchorY} C ${isLeft ? pinX - 36 : pinX + 36} ${item.anchorY}, ${isLeft ? midX + 16 : midX - 16} ${cardCenterY}, ${cardJoinX} ${cardCenterY}" fill="none" stroke="${stroke}" stroke-width="2.4" stroke-linecap="round"/>`);
+      parts.push(`<path d="M ${pinX} ${item.anchorY} C ${isLeft ? pinX - 42 : pinX + 42} ${item.anchorY}, ${isLeft ? midX + 20 : midX - 20} ${cardCenterY}, ${cardJoinX} ${cardCenterY}" fill="none" stroke="${stroke}" stroke-width="2.8" stroke-linecap="round"/>`);
       parts.push(`<circle cx="${cardJoinX}" cy="${cardCenterY}" r="5" fill="${stroke}"/>`);
-      parts.push(`<rect x="${cardX}" y="${cardY}" width="${CARD_W}" height="${CARD_H}" rx="14" fill="url(#moduleCard)" stroke="${stroke}" stroke-width="1.8" filter="url(#shadow)"/>`);
-      parts.push(`<rect x="${cardX + 8}" y="${cardY + 8}" width="${CARD_W - 16}" height="${CARD_H - 16}" rx="10" fill="#0d1726" opacity="0.55"/>`);
-      parts.push(renderModuleIcon(item.theme.icon, cardX + 14, cardY + 10, accent));
-      parts.push(`<text x="${cardX + 90}" y="${cardY + 28}" font-size="13" font-weight="700" fill="${COLORS.text}">${esc(item.name)}</text>`);
-      parts.push(`<text x="${cardX + 90}" y="${cardY + 46}" font-size="11" fill="#a5b4c9">${esc(item.pinLabel)} • ${esc(item.roleLabel)}</text>`);
-      parts.push(`<text x="${cardX + 90}" y="${cardY + 63}" font-size="11" fill="#93c5fd">${esc(moduleDetailText(item.mod))}</text>`);
-      parts.push(`<rect x="${pinBadgeX}" y="${cardY + CARD_H - 24}" width="58" height="16" rx="8" fill="#142235" stroke="${stroke}" stroke-width="1"/>`);
-      parts.push(`<text x="${pinBadgeX + 29}" y="${cardY + CARD_H - 12}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${stroke}">GPIO ${item.gpio}</text>`);
+      parts.push(`<rect x="${cardX}" y="${cardY}" width="${CARD_W}" height="${CARD_H}" rx="16" fill="url(#moduleCard)" stroke="${stroke}" stroke-width="2" filter="url(#shadow)"/>`);
+      parts.push(`<rect x="${cardX + 8}" y="${cardY + 8}" width="${CARD_W - 16}" height="${CARD_H - 16}" rx="12" fill="#0d1726" opacity="0.55"/>`);
+      parts.push(renderModuleIcon(item.theme.icon, cardX + 12, cardY + 15, accent, item.mod));
+      parts.push(`<text x="${cardX + 94}" y="${cardY + 30}" font-size="13.5" font-weight="700" fill="${COLORS.text}">${esc(item.name)}</text>`);
+      parts.push(`<text x="${cardX + 94}" y="${cardY + 49}" font-size="11.5" fill="#a5b4c9">${esc(item.pinLabel)} • ${esc(item.roleLabel)}</text>`);
+      parts.push(`<text x="${cardX + 94}" y="${cardY + 69}" font-size="11.25" fill="#93c5fd">${esc(moduleDetailText(item.mod))}</text>`);
+      parts.push(`<rect x="${pinBadgeX}" y="${cardY + CARD_H - 26}" width="60" height="18" rx="9" fill="#142235" stroke="${stroke}" stroke-width="1"/>`);
+      parts.push(`<text x="${pinBadgeX + 30}" y="${cardY + CARD_H - 13}" text-anchor="middle" font-size="11" font-weight="700" fill="${stroke}">GPIO ${item.gpio}</text>`);
       parts.push(`<circle cx="${connectorX}" cy="${cardCenterY}" r="4" fill="${stroke}"/>`);
     });
   }
@@ -375,26 +414,28 @@ function renderDiagramSVG(boardId, catalog, assignResult) {
   drawModuleCards(leftCards, "left");
   drawModuleCards(rightCards, "right");
 
-  if (i2cModules.length) {
-    const busY = boardBottom + 30;
+  if (hasI2C) {
     const busX1 = BOARD_X + BOARD_W * 0.28;
     const busX2 = BOARD_X + BOARD_W * 0.72;
-    const boxW = 340;
-    const boxH = 44 + i2cModules.length * 24;
-    const boxX = BOARD_X + BOARD_W / 2 - boxW / 2;
 
-    parts.push(`<line x1="${busX1}" y1="${boardBottom}" x2="${busX1}" y2="${busY}" stroke="${COLORS.bus}" stroke-width="2.4"/>`);
-    parts.push(`<line x1="${busX2}" y1="${boardBottom}" x2="${busX2}" y2="${busY}" stroke="${COLORS.bus}" stroke-width="2.4"/>`);
-    parts.push(`<line x1="${busX1}" y1="${busY}" x2="${busX2}" y2="${busY}" stroke="${COLORS.bus}" stroke-width="3"/>`);
-    parts.push(`<rect x="${boxX}" y="${busY + 18}" width="${boxW}" height="${boxH}" rx="14" fill="url(#moduleCard)" stroke="${COLORS.bus}" stroke-width="1.7" filter="url(#shadow)"/>`);
-    parts.push(`<text x="${boxX + boxW / 2}" y="${busY + 41}" text-anchor="middle" font-size="12" font-weight="700" fill="${COLORS.bus}">Shared I²C bus on GPIO21 (SDA) and GPIO22 (SCL)</text>`);
+    parts.push(`<line x1="${busX1}" y1="${boardBottom}" x2="${busX1}" y2="${busY}" stroke="${COLORS.bus}" stroke-width="2.8"/>`);
+    parts.push(`<line x1="${busX2}" y1="${boardBottom}" x2="${busX2}" y2="${busY}" stroke="${COLORS.bus}" stroke-width="2.8"/>`);
+    parts.push(`<line x1="${busX1}" y1="${busY}" x2="${busX2}" y2="${busY}" stroke="${COLORS.bus}" stroke-width="3.4"/>`);
+    parts.push(`<rect x="${i2cBoxX}" y="${i2cBoxY}" width="${i2cBoxW}" height="${i2cBoxH}" rx="18" fill="url(#moduleCard)" stroke="${COLORS.bus}" stroke-width="1.9" filter="url(#shadow)"/>`);
+    parts.push(`<rect x="${i2cBoxX + 10}" y="${i2cBoxY + 10}" width="${i2cBoxW - 20}" height="${i2cBoxH - 20}" rx="14" fill="#0d1726" opacity="0.55"/>`);
+    parts.push(`<text x="${i2cBoxX + i2cBoxW / 2}" y="${i2cBoxY + 24}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${COLORS.bus}">Shared I²C bus on GPIO21 (SDA) and GPIO22 (SCL)</text>`);
     i2cModules.forEach((mod, i) => {
       const theme = moduleTheme(mod);
-      const rowY = busY + 62 + i * 24;
-      const leftDot = boxX + 24;
-      parts.push(`<circle cx="${leftDot}" cy="${rowY - 4}" r="4" fill="${theme.stroke}"/>`);
-      parts.push(`<text x="${leftDot + 16}" y="${rowY}" font-size="11.5" fill="${COLORS.text}">${esc(mod.name)}</text>`);
-      parts.push(`<text x="${boxX + boxW - 18}" y="${rowY}" text-anchor="end" font-size="10.5" fill="#93c5fd">${esc(moduleDetailText(mod))}</text>`);
+      const rowY = i2cBoxY + 58 + i * i2cRowGap;
+      const assetPath = moduleAssetPath(mod);
+      const leftDot = i2cBoxX + 32;
+      if (assetPath) {
+        parts.push(`<image href="${assetPath}" x="${i2cBoxX + 16}" y="${rowY - 24}" width="50" height="32" preserveAspectRatio="xMidYMid meet"/>`);
+      } else {
+        parts.push(`<circle cx="${leftDot}" cy="${rowY - 4}" r="4.5" fill="${theme.stroke}"/>`);
+      }
+      parts.push(`<text x="${i2cBoxX + 78}" y="${rowY - 2}" font-size="12" font-weight="700" fill="${COLORS.text}">${esc(mod.name)}</text>`);
+      parts.push(`<text x="${i2cBoxX + 78}" y="${rowY + 13}" font-size="10.5" fill="#93c5fd">${esc(moduleDetailText(mod))}</text>`);
     });
   }
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <circle cx="90" cy="80" r="48" fill="#171717" stroke="#7c3aed" stroke-width="5"/>
+  <circle cx="90" cy="80" r="15" fill="#2b2b2b" stroke="#a78bfa" stroke-width="3"/>
+  <circle cx="90" cy="80" r="5" fill="#a78bfa"/>
+  <rect x="70" y="126" width="8" height="28" rx="3" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="102" y="126" width="8" height="28" rx="3" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+  <path d="M126 56 Q144 80 126 104" fill="none" stroke="#a78bfa" stroke-width="5" opacity="0.7"/>
+  <path d="M138 46 Q164 80 138 114" fill="none" stroke="#c4b5fd" stroke-width="4" opacity="0.45"/>
+  <text x="90" y="172" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#dbeafe">Piezo buzzer</text>
+</svg>

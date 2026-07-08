@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200">
+  <defs>
+    <linearGradient id="housing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d5dce5"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+  <path d="M70 50 L170 50 L190 92 Q194 100 188 110 L164 150 Q160 158 150 158 H90 Q80 158 76 150 L52 110 Q46 100 50 92 Z" fill="url(#housing)" stroke="#64748b" stroke-width="4"/>
+  <rect x="90" y="150" width="60" height="14" rx="7" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>
+  <path d="M90 62 L120 92 L150 62" fill="none" stroke="#475569" stroke-width="4"/>
+  <rect x="92" y="94" width="56" height="28" rx="6" fill="#475569" opacity="0.38"/>
+  <path d="M178 118 C190 110 204 112 216 122" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="56" cy="76" r="8" fill="#60a5fa" opacity="0.85"/>
+  <circle cx="44" cy="100" r="6" fill="#60a5fa" opacity="0.72"/>
+  <circle cx="62" cy="116" r="5" fill="#60a5fa" opacity="0.6"/>
+  <text x="120" y="188" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#dbeafe">Tipping-bucket rain gauge</text>
+</svg>
