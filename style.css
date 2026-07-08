@@ -37,18 +37,45 @@ header {
   padding: 18px 24px;
   border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.header-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 header h1 {
-  font-size: 18px;
+  font-size: 24px;
   margin: 0;
 }
 
+.hero-subtitle {
+  margin: 0;
+  max-width: 760px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 header .tag {
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
   color: var(--muted);
+  border: 1px solid var(--border);
+  background: rgba(22, 31, 46, 0.85);
+  border-radius: 999px;
+  padding: 5px 10px;
 }
 
 .layout {
@@ -80,6 +107,30 @@ header .tag {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
+}
+
+.how-it-works {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(56,189,248,0.08), rgba(34,197,94,0.04));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.how-it-works strong {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #cbd5e1;
+}
+
+.how-it-works span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .preset-btn {
@@ -141,10 +192,35 @@ header .tag {
 }
 .diagram-wrap svg { width: 100%; min-width: 1040px; height: auto; display: block; }
 
-.messages { list-style: none; margin: 8px 0; padding: 0; font-size: 12px; }
+.messages { list-style: none; margin: 0; padding: 0; font-size: 12px; }
 .messages li { padding: 4px 0; }
 .messages li.error { color: var(--danger); }
 .messages li.warning { color: var(--warn); }
+
+.agent-update {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(17,24,39,0.9), rgba(12,19,31,0.9));
+  color: #dbeafe;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.agent-update.live {
+  border-color: rgba(34,197,94,0.5);
+  color: #dcfce7;
+}
+
+.agent-update.offline {
+  border-color: rgba(250,204,21,0.5);
+  color: #fef3c7;
+}
+
+.agent-update.thinking {
+  border-color: rgba(56,189,248,0.5);
+  color: #dbeafe;
+}
 
 .code-wrap {
   flex: 1;

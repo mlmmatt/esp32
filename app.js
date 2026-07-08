@@ -8,6 +8,7 @@ const state = {
   lastCode: "",
   agentBusy: false,
   autoRegenTimer: null,
+  lastSummary: "",
 };
 
 const el = {};
@@ -24,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   el.chatInput = document.getElementById("chat-input");
   el.chatSend = document.getElementById("chat-send");
   el.statusPill = document.getElementById("status-pill");
+  el.agentUpdate = document.getElementById("agent-update");
 
   renderBoardSelector();
   renderPresets();
@@ -35,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") onSend();
   });
 
-  appendChat("system", "Pick modules on the left (or a preset above), then ask the agent for behavior in the chat box.");
+  appendChat("system", "Pick a preset or modules, review the wiring plan, then ask Hy3 for behavior tweaks.");
 });
 
 function renderBoardSelector() {
@@ -153,7 +155,12 @@ function appendChat(role, text) {
 
 function setStatus(mode) {
   el.statusPill.className = "status-pill " + mode;
-  el.statusPill.textContent = mode === "live" ? "Hy3: live" : mode === "offline" ? "Hy3: no key yet (fallback mode)" : "Hy3: thinking...";
+  el.statusPill.textContent = mode === "live" ? "Hy3: live" : mode === "offline" ? "Hy3: fallback template" : "Hy3: updating sketch...";
+}
+
+function setAgentUpdate(text, mode) {
+  el.agentUpdate.textContent = text;
+  el.agentUpdate.className = "agent-update" + (mode ? ` ${mode}` : "");
 }
 
 function scheduleAutoRegenerate(message) {
@@ -188,6 +195,7 @@ async function requestAgent(userMessage, silent) {
   state.agentBusy = true;
   el.chatSend.disabled = true;
   setStatus("thinking");
+  setAgentUpdate(silent ? "Hy3 is updating the sketch for the current hardware selection..." : "Hy3 is adapting the sketch and explanation for your current hardware.", "thinking");
   if (!silent) appendChat("system", "Hy3 is generating code...");
 
   const payload = {
@@ -214,6 +222,12 @@ async function requestAgent(userMessage, silent) {
       const fallback = generateFallbackCode(state.board, [...state.selected], assign, MODULE_CATALOG);
       renderCode(fallback.code);
       renderSerial(fallback.serialLines);
+      setAgentUpdate(
+        silent
+          ? "Sketch updated with the local fallback template for the current hardware selection."
+          : "Hy3 was unavailable, so the app generated a local wiring-aware template instead.",
+        "offline"
+      );
       appendChat(
         "system",
         silent
@@ -228,8 +242,13 @@ async function requestAgent(userMessage, silent) {
     state.chatHistory.push({ role: "assistant", content: data.explanation || "" });
     renderCode(data.code || "");
     renderSerial(data.serialLines || []);
+    state.lastSummary = data.summary || "";
+    setAgentUpdate(
+      data.summary || (silent ? "Hy3 updated the sketch for the current hardware selection." : "Hy3 adapted the sketch for your requested hardware behavior."),
+      "live"
+    );
     if (data.explanation) {
-      if (silent) appendChat("system", "Sketch updated for the current hardware selection.");
+      if (silent) appendChat("system", data.summary || "Sketch updated for the current hardware selection.");
       else appendChat("assistant", data.explanation);
     }
     if (Array.isArray(data.warnings)) {
@@ -240,6 +259,12 @@ async function requestAgent(userMessage, silent) {
     const fallback = generateFallbackCode(state.board, [...state.selected], assign, MODULE_CATALOG);
     renderCode(fallback.code);
     renderSerial(fallback.serialLines);
+    setAgentUpdate(
+      silent
+        ? "Sketch updated with the local fallback template for the current hardware selection."
+        : "Network issue reaching Hy3, so the app generated a local wiring-aware template instead.",
+      "offline"
+    );
     appendChat(
       "system",
       silent ? "Sketch updated locally (fallback mode)." : "Network error reaching the agent -- showing a local template instead."

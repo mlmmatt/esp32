@@ -8,15 +8,26 @@
 </head>
 <body>
 <header>
-  <h1>ESP32 Circuit Playground</h1>
-  <span class="tag">module picker + AI wiring &amp; code, powered by Hy3 (tencent/hy3:free)</span>
-  <span class="status-pill" id="status-pill" style="margin-left:auto;">Hy3: idle</span>
+  <div class="header-copy">
+    <h1>ESP32 Circuit Playground</h1>
+    <p class="hero-subtitle">Build ESP32 projects visually. Pick hardware, get a safe wiring plan, and let Hy3 adapt the sketch.</p>
+    <div class="hero-meta">
+      <span class="tag">Deterministic pin planning + Hy3 code adaptation</span>
+      <span class="tag">Flagship flow: Weather Station → Rain Gauge → Anemometer</span>
+    </div>
+  </div>
+  <span class="status-pill" id="status-pill">Hy3: idle</span>
 </header>
 
 <div class="layout">
   <div class="panel" id="left-panel">
     <h2>Quick start</h2>
     <div class="presets" id="presets"></div>
+
+    <div class="how-it-works">
+      <strong>How it works</strong>
+      <span>1) Pick a preset or board modules  2) Review the wiring plan  3) Let Hy3 adapt the sketch</span>
+    </div>
 
     <h2>Board</h2>
     <div class="board-select" id="board-select"></div>
@@ -27,6 +38,7 @@
 
   <div class="center-col">
     <div class="panel diagram-wrap" id="diagram-wrap"></div>
+    <div class="agent-update" id="agent-update">Select a preset or modules to generate a wiring-aware sketch.</div>
     <ul class="messages" id="messages"></ul>
     <div class="panel" style="flex:1; display:flex; flex-direction:column;">
       <h2>Generated sketch</h2>
@@ -36,7 +48,7 @@
 
   <div class="right-col">
     <div class="panel" style="flex:1; display:flex; flex-direction:column;">
-      <h2>Chat with the agent</h2>
+      <h2>Chat with Hy3</h2>
       <div class="chat-log" id="chat-log"></div>
       <div class="chat-input">
         <input id="chat-input" type="text" placeholder='e.g. "add a buzzer alarm above 70% humidity"' />
