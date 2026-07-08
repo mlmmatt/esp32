@@ -7,6 +7,7 @@ const state = {
   lastAssign: null,
   lastCode: "",
   agentBusy: false,
+  autoRegenTimer: null,
 };
 
 const el = {};
@@ -59,6 +60,7 @@ function renderBoardSelector() {
       renderBoardSelector();
       renderModuleList();
       recomputeDiagram();
+      scheduleAutoRegenerate(`Update the sketch for the current ${BOARD_PROFILES[state.board].label} selection.`);
     });
     el.boardButtons.appendChild(btn);
   }
@@ -76,7 +78,7 @@ function renderPresets() {
       renderBoardSelector();
       renderModuleList();
       recomputeDiagram();
-      requestAgent(`Generate the initial sketch for the "${preset.name}" preset.`, true);
+      scheduleAutoRegenerate(`Generate the initial sketch for the "${preset.name}" preset.`);
     });
     el.presets.appendChild(btn);
   }
@@ -98,6 +100,7 @@ function renderModuleList() {
       if (checkbox.checked) state.selected.add(mod.id);
       else state.selected.delete(mod.id);
       recomputeDiagram();
+      scheduleAutoRegenerate("Update the sketch for the current hardware selection.");
     });
 
     const labelWrap = document.createElement("div");
@@ -153,6 +156,15 @@ function setStatus(mode) {
   el.statusPill.textContent = mode === "live" ? "Hy3: live" : mode === "offline" ? "Hy3: no key yet (fallback mode)" : "Hy3: thinking...";
 }
 
+function scheduleAutoRegenerate(message) {
+  if (state.autoRegenTimer) clearTimeout(state.autoRegenTimer);
+  if (state.selected.size === 0) return;
+  state.autoRegenTimer = setTimeout(() => {
+    state.autoRegenTimer = null;
+    requestAgent(message, true);
+  }, 700);
+}
+
 async function onSend() {
   const text = el.chatInput.value.trim();
   if (!text) return;
@@ -204,7 +216,9 @@ async function requestAgent(userMessage, silent) {
       renderSerial(fallback.serialLines);
       appendChat(
         "system",
-        (data && data.error ? data.error : "Agent unavailable") + " -- showing a local template instead."
+        silent
+          ? "Sketch updated locally (fallback mode)."
+          : (data && data.error ? data.error : "Agent unavailable") + " -- showing a local template instead."
       );
       return;
     }
@@ -214,7 +228,10 @@ async function requestAgent(userMessage, silent) {
     state.chatHistory.push({ role: "assistant", content: data.explanation || "" });
     renderCode(data.code || "");
     renderSerial(data.serialLines || []);
-    if (data.explanation) appendChat("assistant", data.explanation);
+    if (data.explanation) {
+      if (silent) appendChat("system", "Sketch updated for the current hardware selection.");
+      else appendChat("assistant", data.explanation);
+    }
     if (Array.isArray(data.warnings)) {
       for (const w of data.warnings) addMessage(w, "warning");
     }
@@ -223,7 +240,10 @@ async function requestAgent(userMessage, silent) {
     const fallback = generateFallbackCode(state.board, [...state.selected], assign, MODULE_CATALOG);
     renderCode(fallback.code);
     renderSerial(fallback.serialLines);
-    appendChat("system", "Network error reaching the agent -- showing a local template instead.");
+    appendChat(
+      "system",
+      silent ? "Sketch updated locally (fallback mode)." : "Network error reaching the agent -- showing a local template instead."
+    );
   } finally {
     state.agentBusy = false;
     el.chatSend.disabled = false;

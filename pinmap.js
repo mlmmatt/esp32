@@ -137,6 +137,18 @@ function assignPins(selectedModuleIds, boardId, catalog) {
     }
     result.assignments[modId] = { type: mod.interface, pins: { SIG: pin } };
 
+    if (modId === "rain_gauge") {
+      result.warnings.push(
+        "Rain Gauge uses pulse counting on GPIO" + pin + ". Enable a pull-up, debounce bucket tips, and protect long outdoor cable runs from noise."
+      );
+    }
+
+    if (modId === "anemometer") {
+      result.warnings.push(
+        "Anemometer uses pulse counting on GPIO" + pin + ". Check whether your sensor needs a pull-up, and calibrate pulses-per-speed for the exact model."
+      );
+    }
+
     if (boardId === "cam" && (pin === 4 || pin === 12)) {
       result.warnings.push(
         pin === 4
