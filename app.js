@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   el.moduleList = document.getElementById("module-list");
   el.presets = document.getElementById("presets");
   el.boardButtons = document.getElementById("board-select");
+  el.leftPanel = document.getElementById("left-panel");
   el.diagramWrap = document.getElementById("diagram-wrap");
   el.diagramViewport = document.getElementById("diagram-viewport");
   el.diagramCanvas = document.getElementById("diagram-canvas");
@@ -52,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
   el.agentUpdate = document.getElementById("agent-update");
   el.heroSubtitle = document.getElementById("hero-subtitle");
   el.heroTagline = document.getElementById("hero-tagline");
+  el.heroDemoBtn = document.getElementById("hero-demo-btn");
+  el.heroManualBtn = document.getElementById("hero-manual-btn");
   el.assistantLabel = document.getElementById("assistant-label");
 
   if (copy) {
@@ -71,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
   el.chatInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") onSend();
   });
+  el.heroDemoBtn.addEventListener("click", () => startDemoMode("hero"));
+  el.heroManualBtn.addEventListener("click", focusManualBuilder);
 
   initDiagramControls();
 
@@ -109,18 +114,25 @@ function renderPresets() {
   el.presets.innerHTML = "";
   for (const [key, preset] of Object.entries(PRESETS)) {
     const btn = document.createElement("button");
-    btn.className = "preset-btn";
-    btn.innerHTML = `${preset.name}<small>${preset.description}</small>`;
+    btn.className = "preset-btn" + (key === "weather_station" ? " featured" : "");
+    btn.innerHTML = `${key === "weather_station" ? '<div class="preset-btn-head"><span>Weather Station</span><span class="preset-badge">Best first demo</span></div>' : preset.name}<small>${preset.description}</small>`;
     btn.addEventListener("click", () => {
-      state.board = preset.board;
-      state.selected = new Set(preset.modules);
-      renderBoardSelector();
-      renderModuleList();
-      recomputeDiagram();
+      applyPresetSelection(key);
       scheduleAutoRegenerate(`Generate the initial sketch for the "${preset.name}" preset.`);
     });
     el.presets.appendChild(btn);
   }
+}
+
+function applyPresetSelection(presetKey) {
+  const preset = PRESETS[presetKey];
+  if (!preset) return null;
+  state.board = preset.board;
+  state.selected = new Set(preset.modules);
+  renderBoardSelector();
+  renderModuleList();
+  recomputeDiagram();
+  return preset;
 }
 
 function renderModuleList() {
@@ -158,12 +170,93 @@ function renderModuleList() {
   }
 }
 
+function renderEmptyDiagramState() {
+  el.diagramCanvas.innerHTML = `
+    <div class="diagram-empty">
+      <div class="diagram-empty-visual" aria-hidden="true">
+        <div class="diagram-empty-glow"></div>
+        <div class="diagram-empty-module top-left"><strong>DHT22</strong>Temp + humidity</div>
+        <div class="diagram-empty-module top-right"><strong>OLED</strong>Live dashboard</div>
+        <div class="diagram-empty-module bottom-right"><strong>BMP280</strong>Pressure + trends</div>
+        <div class="diagram-empty-wire one"></div>
+        <div class="diagram-empty-wire two"></div>
+        <div class="diagram-empty-wire three"></div>
+        <div class="diagram-empty-board">
+          <div class="diagram-empty-board-label">ESP32 Demo Board</div>
+        </div>
+      </div>
+      <div class="diagram-empty-copy">
+        <span class="diagram-empty-kicker">Wiring preview</span>
+        <h3>Build your first ESP32 wiring diagram in one click.</h3>
+        <p>Start with the Weather Station demo to auto-generate a wiring-safe layout, a starter sketch, and a short Hy3 walkthrough. Or jump straight into manual module selection.</p>
+        <div class="diagram-empty-actions">
+          <button type="button" class="cta-btn" id="empty-demo-btn">Try Weather Station demo</button>
+          <button type="button" class="cta-btn secondary" id="empty-manual-btn">Pick modules manually</button>
+        </div>
+        <ul class="diagram-empty-steps">
+          <li>
+            <span class="diagram-empty-step-num">1</span>
+            <span class="diagram-empty-step-copy"><strong>Choose the flagship setup</strong><span>Load the ESP32 DevKit with weather sensors and the OLED already selected.</span></span>
+          </li>
+          <li>
+            <span class="diagram-empty-step-num">2</span>
+            <span class="diagram-empty-step-copy"><strong>See the board auto-center</strong><span>Open with a clean, screenshot-ready pin plan instead of a crowded diagram.</span></span>
+          </li>
+          <li>
+            <span class="diagram-empty-step-num">3</span>
+            <span class="diagram-empty-step-copy"><strong>Open with code plus Hy3 notes</strong><span>Get a starter sketch immediately, then refine thresholds or behavior in chat.</span></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  `;
+
+  const emptyDemoBtn = document.getElementById("empty-demo-btn");
+  const emptyManualBtn = document.getElementById("empty-manual-btn");
+  if (emptyDemoBtn) emptyDemoBtn.addEventListener("click", () => startDemoMode("empty-state"));
+  if (emptyManualBtn) emptyManualBtn.addEventListener("click", focusManualBuilder);
+}
+
+function focusManualBuilder() {
+  if (el.leftPanel) {
+    el.leftPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  const firstCompatible = el.moduleList.querySelector('input:not([disabled])');
+  if (firstCompatible) {
+    firstCompatible.focus({ preventScroll: true });
+  }
+}
+
+async function startDemoMode(source) {
+  if (state.autoRegenTimer) {
+    clearTimeout(state.autoRegenTimer);
+    state.autoRegenTimer = null;
+  }
+
+  const preset = applyPresetSelection("weather_station");
+  if (!preset) return;
+
+  state.chatHistory = [];
+  el.chatLog.innerHTML = "";
+  appendChat("system", source === "empty-state"
+    ? "Demo mode loaded from the empty canvas. Hy3 is preparing the flagship Weather Station walkthrough."
+    : "Demo mode loaded. Hy3 is preparing the flagship Weather Station walkthrough.");
+  renderCode(`// Loading ${preset.name} demo sketch...\n// Generating deterministic starter code and Hy3 notes.`);
+  el.serial.innerHTML = '<div class="line">Demo mode primed. Waiting for the first generated run...</div>';
+  fitDiagramToViewport();
+  await requestAgent(
+    `Generate the initial sketch for the "${preset.name}" preset. Give a concise demo-ready explanation of the sensor flow, OLED dashboard, and buzzer threshold behavior so a first-time viewer immediately understands the build.`,
+    false
+  );
+  el.chatInput.focus();
+}
+
 function recomputeDiagram() {
   const assign = assignPins([...state.selected], state.board, MODULE_CATALOG);
   state.lastAssign = assign;
 
   if (state.selected.size === 0) {
-    el.diagramCanvas.innerHTML = '<div class="diagram-empty">Select modules to see the wiring diagram.</div>';
+    renderEmptyDiagramState();
     diagramState.contentWidth = 0;
     diagramState.contentHeight = 0;
     diagramState.scale = 1;
@@ -254,11 +347,15 @@ async function requestAgent(userMessage, silent) {
     userMessage,
   };
 
+  const controller = new AbortController();
+  const requestTimeout = setTimeout(() => controller.abort(), 12000);
+
   try {
     const resp = await fetch("/api/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
     const data = await resp.json();
 
@@ -320,11 +417,12 @@ async function requestAgent(userMessage, silent) {
       copy
         ? copy.getSystemChatCopy({
             mode: silent ? "silent-offline" : "loud-offline",
-            errorText: "Network error reaching Hy3 assist",
+            errorText: err && err.name === "AbortError" ? "Hy3 assist timed out" : "Network error reaching Hy3 assist",
           })
         : "Showing local sketch instead."
     );
   } finally {
+    clearTimeout(requestTimeout);
     state.agentBusy = false;
     el.chatSend.disabled = false;
   }
@@ -337,6 +435,14 @@ function renderCode(code) {
 
 function renderSerial(lines) {
   el.serial.innerHTML = "";
+  if (!lines.length) {
+    const empty = document.createElement("div");
+    empty.className = "line";
+    empty.textContent = "Serial output will appear here after the generated sketch runs.";
+    el.serial.appendChild(empty);
+    return;
+  }
+
   let i = 0;
   function step() {
     if (i >= lines.length) return;

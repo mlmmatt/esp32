@@ -15,6 +15,10 @@
       <span class="tag" id="hero-tagline">Deterministic core build + optional Hy3 assist</span>
       <span class="tag">Flagship flow: Weather Station → Rain Gauge → Anemometer</span>
     </div>
+    <div class="hero-actions">
+      <button type="button" class="cta-btn" id="hero-demo-btn">Try the Weather Station demo</button>
+      <button type="button" class="cta-btn secondary" id="hero-manual-btn">Pick modules manually</button>
+    </div>
   </div>
   <span class="status-pill" id="status-pill">Core build: ready</span>
 </header>
@@ -58,7 +62,8 @@
     <ul class="messages" id="messages"></ul>
     <div class="panel" style="flex:1; display:flex; flex-direction:column;">
       <h2>Generated sketch</h2>
-      <div class="code-wrap" style="flex:1;"><pre id="code-output">// Select modules or a preset to generate code.</pre></div>
+      <div class="code-wrap" style="flex:1;"><pre id="code-output">// Start with the Weather Station demo or pick modules to generate a wiring-safe sketch.
+// Hy3 can then explain the pin plan or refine the behavior.</pre></div>
     </div>
   </div>
 
@@ -73,7 +78,7 @@
     </div>
     <div class="panel">
       <h2>Simulated serial monitor</h2>
-      <div class="serial-monitor" id="serial-monitor"></div>
+      <div class="serial-monitor" id="serial-monitor"><div class="line">Serial output will appear here after the demo sketch runs.</div></div>
     </div>
   </div>
 </div>
