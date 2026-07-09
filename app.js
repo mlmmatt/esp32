@@ -534,13 +534,21 @@ function clampDiagramPan() {
 function getDiagramContentSize() {
   const svg = el.diagramCanvas.querySelector("svg");
   if (!svg) return { width: 0, height: 0 };
+
+  const renderedWidth = svg.clientWidth || svg.getBoundingClientRect().width;
+  const renderedHeight = svg.clientHeight || svg.getBoundingClientRect().height;
+  if (renderedWidth && renderedHeight) {
+    return { width: renderedWidth, height: renderedHeight };
+  }
+
   const viewBox = svg.viewBox && svg.viewBox.baseVal;
   if (viewBox && viewBox.width && viewBox.height) {
     return { width: viewBox.width, height: viewBox.height };
   }
+
   return {
-    width: svg.clientWidth || 560,
-    height: svg.clientHeight || 560,
+    width: 560,
+    height: 560,
   };
 }
 
