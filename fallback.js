@@ -90,7 +90,7 @@ function generateFallbackCode(board, selectedIds, assign, catalog) {
     "}",
     "",
     "void loop() {",
-    ...(loopLines.length ? loopLines : ["  // TODO: add behavior once Hy3 is connected"]),
+    ...(loopLines.length ? loopLines : ["  // TODO: add your app behavior here. Hy3 can still help explain or refine it later."]),
     "  delay(1000);",
     "}",
   ].join("\n");

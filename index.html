@@ -10,13 +10,13 @@
 <header>
   <div class="header-copy">
     <h1>ESP32 Circuit Playground</h1>
-    <p class="hero-subtitle">Build ESP32 projects visually. Pick hardware, get a safe wiring plan, and let Hy3 adapt the sketch.</p>
+    <p class="hero-subtitle" id="hero-subtitle">Build ESP32 projects visually. Get a deterministic wiring-safe sketch, then use Hy3 for explanation and refinement.</p>
     <div class="hero-meta">
-      <span class="tag">Deterministic pin planning + Hy3 code adaptation</span>
+      <span class="tag" id="hero-tagline">Deterministic core build + optional Hy3 assist</span>
       <span class="tag">Flagship flow: Weather Station → Rain Gauge → Anemometer</span>
     </div>
   </div>
-  <span class="status-pill" id="status-pill">Hy3: idle</span>
+  <span class="status-pill" id="status-pill">Core build: ready</span>
 </header>
 
 <div class="layout">
@@ -26,7 +26,7 @@
 
     <div class="how-it-works">
       <strong>How it works</strong>
-      <span>1) Pick a preset or board modules  2) Review the wiring plan  3) Let Hy3 adapt the sketch</span>
+      <span>1) Pick a preset or board modules  2) Generate a deterministic sketch  3) Use Hy3 to explain or refine it</span>
     </div>
 
     <h2>Board</h2>
@@ -37,7 +37,23 @@
   </div>
 
   <div class="center-col">
-    <div class="panel diagram-wrap" id="diagram-wrap"></div>
+    <div class="panel diagram-wrap" id="diagram-wrap">
+      <div class="diagram-toolbar">
+        <div class="diagram-toolbar-main">
+          <div class="diagram-controls">
+            <button type="button" class="diagram-btn" id="diagram-zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+            <div class="diagram-zoom-badge" id="diagram-zoom-badge" aria-live="polite">100%</div>
+            <button type="button" class="diagram-btn" id="diagram-zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+            <button type="button" class="diagram-btn diagram-btn-wide" id="diagram-fit" title="Fit to frame (F)">Fit</button>
+            <button type="button" class="diagram-btn diagram-btn-wide" id="diagram-reset" title="Reset to 100% (0)">Reset</button>
+          </div>
+        </div>
+        <div class="diagram-hint">Wheel = zoom • drag = pan • double-click = fit • F = fit • 0 = reset</div>
+      </div>
+      <div class="diagram-viewport" id="diagram-viewport">
+        <div class="diagram-canvas" id="diagram-canvas"></div>
+      </div>
+    </div>
     <div class="agent-update" id="agent-update">Select a preset or modules to generate a wiring-aware sketch.</div>
     <ul class="messages" id="messages"></ul>
     <div class="panel" style="flex:1; display:flex; flex-direction:column;">
@@ -48,7 +64,7 @@
 
   <div class="right-col">
     <div class="panel" style="flex:1; display:flex; flex-direction:column;">
-      <h2>Chat with Hy3</h2>
+      <h2 id="assistant-label">Chat with Hy3 assist</h2>
       <div class="chat-log" id="chat-log"></div>
       <div class="chat-input">
         <input id="chat-input" type="text" placeholder='e.g. "add a buzzer alarm above 70% humidity"' />
@@ -66,6 +82,7 @@
 <script src="pinmap.js"></script>
 <script src="diagram.js"></script>
 <script src="fallback.js"></script>
+<script src="ui-copy.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

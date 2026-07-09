@@ -7,6 +7,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "test": "node --test tests/*.test.js",
     "build": "echo 'Static site: no build step required'",
     "vercel-build": "echo 'Static site: no build step required'"
   }
