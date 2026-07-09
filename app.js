@@ -469,10 +469,11 @@ function fitDiagramToViewport() {
   const viewportHeight = el.diagramViewport.clientHeight;
   if (!width || !height || !viewportWidth || !viewportHeight) return;
 
-  const padding = 28;
+  const horizontalPadding = 28;
+  const verticalPadding = 42;
   const fitScale = Math.min(
-    (viewportWidth - padding * 2) / width,
-    (viewportHeight - padding * 2) / height
+    (viewportWidth - horizontalPadding * 2) / width,
+    (viewportHeight - verticalPadding * 2) / height
   );
 
   diagramState.contentWidth = width;
